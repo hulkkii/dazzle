@@ -35,17 +35,16 @@ const plugins = basePlugins
   .concat(process.env.NODE_ENV === 'production' ? prodPlugins : [])
   .concat(process.env.NODE_ENV === 'development' ? devPlugins : []);
 
-/* eslint max-len: "off" */
 module.exports = {
   entry: {
-    app: getEntrySources(['./sample/index.js']),
+    app: getEntrySources(['./sample/index.tsx']),
     vendor: [
       'react',
     ],
   },
 
   resolve: {
-    extensions: ['.js', '.jsx'],
+    extensions: ['.ts', '.tsx', '.js', '.jsx'],
   },
 
   output: {
@@ -66,6 +65,7 @@ module.exports = {
 
   module: {
     rules: [
+      { test: /\.(ts|tsx)$/, loader: 'ts-loader', exclude: /node_modules/ },
       { test: /\.(js|jsx)$$/, enforce: 'pre', loader: 'source-map-loader' },
       { test: /\.(js|jsx)$$/, enforce: 'pre', loader: 'eslint-loader' },
       { test: /\.css$/, loader: 'style-loader!css-loader' },
