@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
+
 const basePlugins = [
   new webpack.DefinePlugin({
     __DEV__: process.env.NODE_ENV !== 'production',
@@ -13,7 +14,7 @@ const devPlugins = [
 ];
 
 const prodPlugins = [
-  new webpack.optimize.OccurrenceOrderPlugin(),
+  new webpack.optimize.ModuleConcatenationPlugin(),
 ];
 
 const plugins = basePlugins
@@ -21,6 +22,7 @@ const plugins = basePlugins
   .concat(process.env.NODE_ENV === 'development' ? devPlugins : []);
 
 module.exports = {
+  mode: 'production',
   entry: {
     lib: ['./lib/index.js'],
   },
@@ -37,6 +39,7 @@ module.exports = {
     library: 'dazzle',
     libraryTarget: 'umd',
     umdNamedDefine: true,
+    clean: true,
   },
 
   externals: {
@@ -49,10 +52,9 @@ module.exports = {
 
   module: {
     rules: [
-      { test: /\.(js|jsx)$$/, enforce: 'pre', loader: 'source-map-loader' },
-      { test: /\.(js|jsx)$$/, enforce: 'pre', loader: 'eslint-loader' },
-      { test: /\.css$/, loader: 'style-loader!css-loader' },
-      { test: /\.(js|jsx)$/, loaders: ['babel-loader'], exclude: /node_modules/ },
+      { test: /\.(js|jsx)$/, enforce: 'pre', loader: 'source-map-loader' },
+      { test: /\.css$/, use: ['style-loader', 'css-loader'] },
+      { test: /\.(js|jsx)$/, use: ['babel-loader'], exclude: /node_modules/ },
     ],
   },
   node: {

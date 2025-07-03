@@ -86,16 +86,16 @@ class App extends Component {
 }
 ```
 
-Dazzle uses [react-dnd](https://github.com/react-dnd/react-dnd). The default _Dashboard_ component of Dazzle is wrapped by [_DragDropContext_](https://react-dnd.github.io/react-dnd/docs-drag-drop-context.html) of react-dnd.
-So you may want to use react-dnd in your React component hierarchy upper than where you use the _Dashboard_ component of Dazzle. If you do so then you can't let Dazzle creating the _DragDropContext_ because you want to create it yourself upper in the React component hierarchy of your application.
-So forth please use the _DashboardWithoutDndContext_ component of Dazzle and wrapped your own component with _DragDropContext(HTML5Backend)_:
+Dazzle uses [react-dnd](https://github.com/react-dnd/react-dnd). The default _Dashboard_ component of Dazzle is wrapped by [_DndProvider_](https://react-dnd.github.io/react-dnd/docs/api/dnd-provider) of react-dnd.
+So you may want to use react-dnd in your React component hierarchy upper than where you use the _Dashboard_ component of Dazzle. If you do so then you can't let Dazzle creating the _DndProvider_ because you want to create it yourself upper in the React component hierarchy of your application.
+So forth please use the _DashboardWithoutDndContext_ component of Dazzle and wrapped your own component with _DndProvider_:
 ```javascript
 import React, { Component } from 'react';
 import { DashboardWithoutDndContext } from 'react-dazzle';
 
 // react-dnd
-import { DragDropContext } from 'react-dnd';
-import HTML5Backend from 'react-dnd-html5-backend';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 // Your widget. Just another react component.
 import CounterWidget from './widgets/CounterWidget';
@@ -124,11 +124,15 @@ class App extends Component {
   }
 
   render() {
-    return <DashboardWithoutDndContext  widgets={this.state.widgets} layout={this.state.layout}  />
+    return (
+      <DndProvider backend={HTML5Backend}>
+        <DashboardWithoutDndContext widgets={this.state.widgets} layout={this.state.layout} />
+      </DndProvider>
+    )
   }
 }
 
-export default DragDropContext(HTML5Backend)(App);
+export default App;
 ```
 
 ## API

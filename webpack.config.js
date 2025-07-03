@@ -28,7 +28,7 @@ const devPlugins = [
 ];
 
 const prodPlugins = [
-  new webpack.optimize.OccurrenceOrderPlugin(),
+  new webpack.optimize.ModuleConcatenationPlugin(),
 ];
 
 const plugins = basePlugins
@@ -37,11 +37,9 @@ const plugins = basePlugins
 
 /* eslint max-len: "off" */
 module.exports = {
+  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   entry: {
     app: getEntrySources(['./sample/index.js']),
-    vendor: [
-      'react',
-    ],
   },
 
   resolve: {
@@ -50,10 +48,11 @@ module.exports = {
 
   output: {
     path: path.join(__dirname, 'dist'),
-    filename: '[name].[hash].js',
+    filename: '[name].[contenthash].js',
     publicPath: '/',
-    sourceMapFilename: '[name].[hash].js.map',
+    sourceMapFilename: '[name].[contenthash].js.map',
     chunkFilename: '[id].chunk.js',
+    clean: true,
   },
 
   devtool: 'source-map',
@@ -62,22 +61,16 @@ module.exports = {
   devServer: {
     historyApiFallback: { index: '/' },
     proxy: proxy(),
+    hot: true,
   },
 
   module: {
     rules: [
-      { test: /\.(js|jsx)$$/, enforce: 'pre', loader: 'source-map-loader' },
-      { test: /\.(js|jsx)$$/, enforce: 'pre', loader: 'eslint-loader' },
-      { test: /\.css$/, loader: 'style-loader!css-loader' },
-      { test: /\.(js|jsx)$/, loaders: ['babel-loader'], exclude: /node_modules/ },
-      { test: /\.json$/, loader: 'json-loader' },
-      { test: /\.(png|jpg|jpeg|gif|svg)$/, loader: 'url-loader?prefix=img/&limit=5000' },
-      { test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, loader: 'file-loader' },
-      { test: /\.(woff)$/, loader: 'url-loader?prefix=font/&limit=5000' },
-      { test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, loader: 'url-loader?limit=10000&mimetype=application/octet-stream' },
-      { test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, loader: 'url-loader?limit=10000&mimetype=image/svg+xml' },
-      { test: /\.woff(\?v=\d+\.\d+\.\d+)?$/, loader: 'url-loader?limit=10000&minetype=application/font-wof' },
-      { test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/, loader: 'url-loader?limit=10000&minetype=application/font-woff2' },
+      { test: /\.(js|jsx)$/, enforce: 'pre', loader: 'source-map-loader' },
+      { test: /\.css$/, use: ['style-loader', 'css-loader'] },
+      { test: /\.(js|jsx)$/, use: ['babel-loader'], exclude: /node_modules/ },
+      { test: /\.(png|jpg|jpeg|gif|svg)$/, type: 'asset/resource' },
+      { test: /\.(eot|ttf|woff|woff2)$/, type: 'asset/resource' },
     ],
   },
 };
